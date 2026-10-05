@@ -39,6 +39,8 @@ export default function Patients({ onLogout }: { onLogout: () => void }) {
   }
 
 
+  
+
 
 
   return <Layout activePage="/patients" title="Patients" subtitle="Manage patient records and hospital admissions" onLogout={onLogout}>
