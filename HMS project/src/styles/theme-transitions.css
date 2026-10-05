@@ -1,0 +1,63 @@
+:root {
+  --hms-theme-switch-duration: 320ms;
+  --hms-theme-switch-easing: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Temporary, only while switching themes. Local 150/200/300ms transitions
+   must not continue underneath the shared page fade. Normal rules resume afterwards. */
+html[data-hms-theme-switch],
+html[data-hms-theme-switch] *,
+html[data-hms-theme-switch] *::before,
+html[data-hms-theme-switch] *::after {
+  transition-duration: 0s !important;
+  transition-delay: 0s !important;
+}
+
+/* One document snapshot includes the sidebar, navbar, cards, tables and portals. */
+html[data-hms-theme-switch="view"] {
+  view-transition-name: root !important;
+}
+html[data-hms-theme-switch="view"] body,
+html[data-hms-theme-switch="view"] body * {
+  view-transition-name: none !important;
+}
+html[data-hms-theme-switch="view"]::view-transition {
+  pointer-events: none;
+}
+html[data-hms-theme-switch="view"]::view-transition-group(root) {
+  animation-duration: var(--hms-theme-switch-duration);
+  animation-timing-function: var(--hms-theme-switch-easing);
+  animation-delay: 0s;
+}
+html[data-hms-theme-switch="view"]::view-transition-image-pair(root) {
+  isolation: isolate;
+}
+html[data-hms-theme-switch="view"]::view-transition-old(root),
+html[data-hms-theme-switch="view"]::view-transition-new(root) {
+  animation-duration: var(--hms-theme-switch-duration);
+  animation-timing-function: var(--hms-theme-switch-easing);
+  animation-delay: 0s;
+  animation-fill-mode: both;
+  mix-blend-mode: plus-lighter;
+}
+html[data-hms-theme-switch="view"]::view-transition-old(root) {
+  animation-name: hms-theme-fade-out;
+}
+html[data-hms-theme-switch="view"]::view-transition-new(root) {
+  animation-name: hms-theme-fade-in;
+}
+@keyframes hms-theme-fade-out { from { opacity: 1; } to { opacity: 0; } }
+@keyframes hms-theme-fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+html[data-hms-motion="reduced"]::view-transition-group(root),
+html[data-hms-motion="reduced"]::view-transition-old(root),
+html[data-hms-motion="reduced"]::view-transition-new(root) {
+  animation: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  html[data-hms-theme-switch="view"]::view-transition-group(root),
+  html[data-hms-theme-switch="view"]::view-transition-old(root),
+  html[data-hms-theme-switch="view"]::view-transition-new(root) {
+    animation: none !important;
+  }
+}

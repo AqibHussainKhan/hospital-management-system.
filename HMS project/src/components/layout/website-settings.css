@@ -1,0 +1,22 @@
+/* Applied across all pages using Layout. Keeps existing theme colors intact. */
+html[data-hms-density="compact"] .hms-page-content table th,
+html[data-hms-density="compact"] .hms-page-content table td {
+  padding-top: 0.65rem;
+  padding-bottom: 0.65rem;
+}
+html[data-hms-density="compact"] .hms-page-content .hms-card,
+html[data-hms-density="compact"] .hms-page-content .hms-card-soft {
+  border-radius: 16px;
+}
+html[data-hms-motion="reduced"] .hms-app *,
+html[data-hms-motion="reduced"] .hms-app *::before,
+html[data-hms-motion="reduced"] .hms-app *::after {
+  animation: none !important;
+  transition-duration: 0s !important;
+  scroll-behavior: auto !important;
+}
+
+html[data-hms-contrast="high"] .hms-app {
+  --hms-text-muted: var(--hms-text);
+  --hms-text-secondary: var(--hms-text);
+}

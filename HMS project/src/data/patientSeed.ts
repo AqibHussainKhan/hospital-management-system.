@@ -1,0 +1,76 @@
+import type { PatientRecord } from "./activityModel";
+
+const originalPatients = [
+  {
+    id: 1,
+    patientId: "HMS-10241",
+    name: "Muhammad Ahmad",
+    age: 32,
+    gender: "Male",
+    department: "Cardiology",
+    phone: "0300-1234567",
+    status: "Admitted",
+    doctor: "Dr. Ali Raza",
+    initials: "MA",
+  },
+  {
+    id: 2,
+    patientId: "HMS-10240",
+    name: "Ayesha Khan",
+    age: 28,
+    gender: "Female",
+    department: "Neurology",
+    phone: "0301-2345678",
+    status: "Outpatient",
+    doctor: "Dr. Ayesha Malik",
+    initials: "AK",
+  },
+  {
+    id: 3,
+    patientId: "HMS-10239",
+    name: "Hamza Ali",
+    age: 41,
+    gender: "Male",
+    department: "Orthopedics",
+    phone: "0302-3456789",
+    status: "Admitted",
+    doctor: "Dr. Hamza Khan",
+    initials: "HA",
+  },
+  {
+    id: 4,
+    patientId: "HMS-10238",
+    name: "Maryam Iqbal",
+    age: 35,
+    gender: "Female",
+    department: "General",
+    phone: "0303-4567890",
+    status: "Discharged",
+    doctor: "Dr. Sana Ali",
+    initials: "MI",
+  },
+  {
+    id: 5,
+    patientId: "HMS-10237",
+    name: "Usman Tariq",
+    age: 52,
+    gender: "Male",
+    department: "Ophthalmology",
+    phone: "0304-5678901",
+    status: "Outpatient",
+    doctor: "Dr. Usman Tariq",
+    initials: "UT",
+  },
+];
+
+// Existing records have no registration/admission timestamps in the supplied source.
+export const patientSeed: PatientRecord[] = originalPatients.map((patient) => ({
+  ...patient,
+  id: String(patient.id),
+  registeredAt: null,
+  admittedAt: null,
+  updatedAt: null,
+  notes: "",
+  status: patient.status as PatientRecord["status"],
+}));
+
