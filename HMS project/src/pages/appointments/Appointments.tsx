@@ -5,6 +5,7 @@ import type { FormEvent } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Plus, CalendarDays } from "lucide-react";
 import Layout from "../../components/layout/Layout";
+import DeleteConfirmationModal from "../../components/common/DeleteConfirmationModal";
 import {
   useAppointments,
   useToday,
@@ -17,6 +18,7 @@ import AppointmentDetails, {
   statusClass,
 } from "../../components/dashboard/AppointmentDetails";
 import DashboardDialog from "../../components/dashboard/DashboardDialog";
+import { assertUnchangedRecord } from "../../data/recordCore";
 const field = "hms-form-field";
 const blank = (date: string) => ({
   patientRef: "",
@@ -31,6 +33,7 @@ const blank = (date: string) => ({
 });
 export default function Appointments({ onLogout }: { onLogout: () => void }) {
   const { records, save, error } = useAppointments();
+  const [deleteTarget, setDeleteTarget] = useState<AppointmentRecord | null>(null);
   const today = useToday();
   const patients = usePatients();
   const doctors = useDoctors();
@@ -278,12 +281,7 @@ export default function Appointments({ onLogout }: { onLogout: () => void }) {
                   </button>
                   <button
                     className="text-red-500"
-                    onClick={() => {
-                      if (
-                        window.confirm(`Delete appointment for ${a.patient}?`)
-                      )
-                        save(records.filter((r) => r.id !== a.id));
-                    }}
+                    onClick={() => setDeleteTarget(a)}
                   >
                     Delete
                   </button>
@@ -457,6 +455,22 @@ export default function Appointments({ onLogout }: { onLogout: () => void }) {
           </DashboardDialog>
         )}
       </div>
+      {deleteTarget && (
+        <DeleteConfirmationModal
+          title="Delete appointment?"
+          description="This appointment will be removed from the patient's schedule."
+          recordLabel="Selected appointment"
+          recordName={deleteTarget.patient}
+          recordMeta={`${deleteTarget.appointmentId} · ${dateLabel(deleteTarget.date)} · ${deleteTarget.time} · ${deleteTarget.doctor}`}
+          confirmLabel="Delete appointment"
+          error={error}
+          onClose={() => setDeleteTarget(null)}
+          onConfirm={() => {
+            assertUnchangedRecord(records, deleteTarget);
+            return save(records.filter((record) => record.id !== deleteTarget.id));
+          }}
+        />
+      )}
     </Layout>
   );
 }

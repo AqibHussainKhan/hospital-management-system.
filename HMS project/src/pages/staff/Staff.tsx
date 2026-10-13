@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
 import { Plus, Pencil, Search, Trash2 } from "lucide-react";
+import DeleteConfirmationModal from "../../components/common/DeleteConfirmationModal";
 import {
   Page,
   Card,
@@ -16,10 +17,12 @@ import {
   rowClass,
 } from "../../components/administration/shared";
 import type { StaffRecord } from "../../components/administration/shared";
+import { assertUnchangedRecord } from "../../data/recordCore";
 
 const blank: Omit<StaffRecord, "id"> = { name: "", department: "", role: "", phone: "", status: "Active" };
 export default function Staff({ onLogout }: { onLogout: () => void }) {
   const { records, save, error } = useRecords<StaffRecord>(keys.staff);
+  const [deleteTarget, setDeleteTarget] = useState<StaffRecord | null>(null);
   const [form, setForm] = useState(blank);
   const [editing, setEditing] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
@@ -209,15 +212,7 @@ export default function Staff({ onLogout }: { onLogout: () => void }) {
                 <button
                   aria-label={`Delete ${r.name}`}
                   className="text-red-500"
-                  onClick={() => {
-                    if (
-                      window.confirm(
-                        `Delete ${r.name}? Use Inactive status to retain attendance history.`
-                      )
-                    ) {
-                      save(records.filter(s => s.id !== r.id));
-                    }
-                  }}
+                  onClick={() => setDeleteTarget(r)}
                 >
                   <Trash2 size={16} />
                 </button>
@@ -226,6 +221,23 @@ export default function Staff({ onLogout }: { onLogout: () => void }) {
           </tr>
         ))}
       </Table>
+      {deleteTarget && (
+        <DeleteConfirmationModal
+          title="Delete staff member?"
+          description="This staff member will be removed from the hospital staff directory."
+          recordLabel="Selected staff member"
+          recordName={deleteTarget.name}
+          recordMeta={`${deleteTarget.role} · ${deleteTarget.department} · ${deleteTarget.id}`}
+          warning="This action cannot be undone. Use Inactive status to retain attendance history."
+          confirmLabel="Delete staff"
+          error={error}
+          onClose={() => setDeleteTarget(null)}
+          onConfirm={() => {
+            assertUnchangedRecord(records, deleteTarget);
+            return save(records.filter((record) => record.id !== deleteTarget.id));
+          }}
+        />
+      )}
     </Page>
   );
 }

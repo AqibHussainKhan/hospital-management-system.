@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Eye, Pencil, Plus, Search, Trash2, Users } from "lucide-react";
 import Layout from "../../components/layout/Layout";
+import DeleteConfirmationModal from "../../components/common/DeleteConfirmationModal";
 import ActivityDialog from "../../components/dashboard/ActivityDialog";
 import PatientDetails, {
   patientStatusClass,
@@ -14,10 +15,11 @@ import {
   relativeTime,
 } from "../../data/activityModel";
 import {
-  deletePatient,
+  patientStore,
   useActivityClock,
   usePatients,
 } from "../../data/activityStore";
+import { assertUnchangedRecord } from "../../data/recordCore";
 
 export default function Patients({ onLogout }: { onLogout: () => void }) {
   const { records, error: storageError } = usePatients();
@@ -29,6 +31,7 @@ export default function Patients({ onLogout }: { onLogout: () => void }) {
   const [status, setStatus] = useState(params.get("status") || "All");
   const [editing, setEditing] = useState<string | null>(null);
   const [error, setError] = useState("");
+  const [deleteTarget, setDeleteTarget] = useState<(typeof records)[number] | null>(null);
 
   const now = useActivityClock();
   const selectedKey = params.get("patient");
@@ -69,10 +72,12 @@ export default function Patients({ onLogout }: { onLogout: () => void }) {
       { replace: Boolean(selectedKey), preventScrollReset: true },
     );
   }
-  async function remove(id: string, name: string) {
-    if (!window.confirm(`Delete the patient record for ${name}?`)) return;
+  async function remove(target: (typeof records)[number]) {
     try {
-      await deletePatient(id);
+      await patientStore.update((current) => {
+        assertUnchangedRecord(current, target);
+        return current.filter((record) => record.id !== target.id);
+      });
       setError("");
     } catch (reason) {
       setError(
@@ -80,6 +85,7 @@ export default function Patients({ onLogout }: { onLogout: () => void }) {
           ? reason.message
           : "The record could not be deleted.",
       );
+      throw reason;
     }
   }
 
@@ -277,7 +283,7 @@ export default function Patients({ onLogout }: { onLogout: () => void }) {
                           type="button"
                           aria-label={`Delete ${patient.name}`}
                           disabled={Boolean(storageError)}
-                          onClick={() => remove(patient.id, patient.name)}
+                          onClick={() => setDeleteTarget(patient)}
                           className="rounded-lg p-2 text-red-500 hover:bg-red-500/10 disabled:opacity-40"
                         >
                           <Trash2 size={15} />
@@ -338,6 +344,20 @@ export default function Patients({ onLogout }: { onLogout: () => void }) {
             </p>
           </ActivityDialog>
         ))}
+      {deleteTarget && (
+        <DeleteConfirmationModal
+          title="Delete patient?"
+          description="This patient record will be removed from the hospital directory."
+          recordLabel="Selected patient"
+          recordName={deleteTarget.name}
+          recordMeta={`${deleteTarget.patientId} · ${deleteTarget.department}`}
+          warning="This action cannot be undone. Linked clinical records may prevent deletion."
+          confirmLabel="Delete patient"
+          error={storageError || error}
+          onClose={() => setDeleteTarget(null)}
+          onConfirm={() => remove(deleteTarget)}
+        />
+      )}
     </Layout>
   );
 }

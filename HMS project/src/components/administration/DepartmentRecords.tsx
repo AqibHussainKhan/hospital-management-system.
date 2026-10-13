@@ -44,6 +44,7 @@ import { assertUnchangedRecord } from "../../data/recordCore";
 import { pakistanDate } from "../../data/dateModel";
 
 import ActivityDialog from "../dashboard/ActivityDialog";
+import DeleteConfirmationModal from "../common/DeleteConfirmationModal";
 import DoctorShareButton from "../doctors/DoctorShareButton";
 
 import type { DoctorRecord } from "../../data/departmentStore";
@@ -222,6 +223,15 @@ export default function DepartmentRecords({
   const [details, setDetails] = useState<string | null>(params.get("entity"));
   const [form, setForm] = useState<Record<string, string>>({});
   const [error, setError] = useState("");
+  const [deleteTarget, setDeleteTarget] = useState<Row | null>(null);
+
+  const recordLabel = {
+    doctors: "doctor",
+    wards: "ward",
+    tests: "laboratory test",
+    medicines: "medicine",
+    surgeries: "procedure",
+  }[kind];
 
   const fields = config.fields as FieldSpec[];
 
@@ -472,16 +482,7 @@ export default function DepartmentRecords({
                   disabled={state.saving}
                   aria-label="Delete record"
                   className="text-red-500"
-                  onClick={async () => {
-                    if (
-                      window.confirm(
-                        "Delete this record? Linked clinical records may prevent deletion.",
-                      )
-                    )
-                      await state.save(
-                        state.records.filter((v) => v.id !== r.id),
-                      );
-                  }}
+                  onClick={() => setDeleteTarget(r)}
                 >
                   <Trash2 size={16} />
                 </button>
@@ -620,6 +621,26 @@ export default function DepartmentRecords({
             Edit Record
           </button>
         </ActivityDialog>
+      )}
+      {deleteTarget && (
+        <DeleteConfirmationModal
+          title={`Delete ${recordLabel}?`}
+          description={`This ${recordLabel} record will be removed from ${config.title}.`}
+          recordLabel={`Selected ${recordLabel}`}
+          recordName={String(deleteTarget.name || deleteTarget.patient || deleteTarget.id)}
+          recordMeta={[
+            deleteTarget.test || deleteTarget.procedure || deleteTarget.department || deleteTarget.batch,
+            deleteTarget.id,
+          ].filter(Boolean).join(" · ")}
+          warning="This action cannot be undone. Linked clinical records may prevent deletion."
+          confirmLabel={`Delete ${kind === "tests" ? "test" : recordLabel}`}
+          error={state.error}
+          onClose={() => setDeleteTarget(null)}
+          onConfirm={() => store.update((current) => {
+            assertUnchangedRecord(current, deleteTarget);
+            return current.filter((record) => record.id !== deleteTarget.id);
+          })}
+        />
       )}
     </Page>
   );

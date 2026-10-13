@@ -1,7 +1,8 @@
-import { shiftMinutes } from "../../data/recordCore";
+import { assertUnchangedRecord, shiftMinutes } from "../../data/recordCore";
 import { useState } from "react";
 import type { FormEvent } from "react";
 import { Search } from "lucide-react";
+import DeleteConfirmationModal from "../../components/common/DeleteConfirmationModal";
 import {
   Page,
   Card,
@@ -26,6 +27,7 @@ import type {
 export default function Attendance({ onLogout }: { onLogout: () => void }) {
   const { records: staff } = useRecords<StaffRecord>(keys.staff);
   const { records, save, error } = useRecords<AttendanceRecord>(keys.attendance);
+  const [deleteTarget, setDeleteTarget] = useState<AttendanceRecord | null>(null);
   const [date, setDate] = useState(today());
   const [staffId, setStaffId] = useState("");
   const [status, setStatus] = useState<AttendanceRecord["status"]>("Present");
@@ -247,15 +249,7 @@ export default function Attendance({ onLogout }: { onLogout: () => void }) {
             <td className={cellClass}>
               <button
                 className="text-red-500"
-                onClick={() => {
-                  if (
-                    window.confirm(
-                      `Delete attendance for ${r.name} on ${r.date}?`
-                    )
-                  ) {
-                    save(records.filter(a => a.id !== r.id));
-                  }
-                }}
+                onClick={() => setDeleteTarget(r)}
               >
                 Delete
               </button>
@@ -263,6 +257,22 @@ export default function Attendance({ onLogout }: { onLogout: () => void }) {
           </tr>
         ))}
       </Table>
+      {deleteTarget && (
+        <DeleteConfirmationModal
+          title="Delete attendance?"
+          description="This attendance entry will be removed from the staff member's daily history."
+          recordLabel="Selected attendance entry"
+          recordName={deleteTarget.name}
+          recordMeta={`${deleteTarget.date} · ${deleteTarget.status} · ${deleteTarget.id}`}
+          confirmLabel="Delete attendance"
+          error={error}
+          onClose={() => setDeleteTarget(null)}
+          onConfirm={() => {
+            assertUnchangedRecord(records, deleteTarget);
+            return save(records.filter((record) => record.id !== deleteTarget.id));
+          }}
+        />
+      )}
     </Page>
   );
 }

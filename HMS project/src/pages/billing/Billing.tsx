@@ -19,10 +19,11 @@ import {
   downloadCsv,
 } from "../../components/administration/shared";
 import type { BillRecord } from "../../data/administrationModel";
-import { decimalToPaisa } from "../../data/recordCore";
+import { assertUnchangedRecord, decimalToPaisa } from "../../data/recordCore";
 import { usePatients } from "../../data/activityStore";
 import { fullTime } from "../../data/activityModel";
 import ActivityDialog from "../../components/dashboard/ActivityDialog";
+import DeleteConfirmationModal from "../../components/common/DeleteConfirmationModal";
 
 const blank = () => ({ patientId: "", service: "", date: today(), amount: "" });
 const billStatus = (r: BillRecord) => r.voided ? "Voided" : r.paid >= r.amount ? "Paid" : r.paid > 0 ? "Partial" : "Unpaid";
@@ -33,6 +34,7 @@ export default function Billing({ onLogout }: { onLogout: () => void }) {
   const [validation, setValidation] = useState(""); const [search, setSearch] = useState(""); const [status, setStatus] = useState("All");
   const [paymentId, setPaymentId] = useState<string | null>(null); const [payment, setPayment] = useState(""); const [reference, setReference] = useState("");
   const [detailsId, setDetailsId] = useState<string | null>(null);
+  const [voidTarget, setVoidTarget] = useState<BillRecord | null>(null);
   const active = state.records.filter(r => !r.voided);
   const filtered = state.records.filter(r => `${r.patient} ${r.patientId} ${r.id} ${r.service}`.toLowerCase().includes(search.toLowerCase()) && (status === "All" || billStatus(r) === status));
   const invoice = state.records.find(r => r.id === paymentId); const detail = state.records.find(r => r.id === detailsId);
@@ -248,19 +250,8 @@ export default function Billing({ onLogout }: { onLogout: () => void }) {
 
                     <button
                       className="text-red-500"
-                      onClick={async () => {
-                        if (
-                          window.confirm(
-                            "Void this unpaid invoice? Its history will be retained."
-                          )
-                        ) {
-                          await state.save(
-                            state.records.map(v =>
-                              v.id === r.id ? { ...v, voided: true } : v
-                            )
-                          );
-                        }
-                      }}
+                      disabled={state.saving}
+                      onClick={() => setVoidTarget(r)}
                     >
                       Void
                     </button>
@@ -440,6 +431,32 @@ export default function Billing({ onLogout }: { onLogout: () => void }) {
             )}
           </div>
         </ActivityDialog>
+      )}
+      {voidTarget && (
+        <DeleteConfirmationModal
+          title="Void invoice?"
+          description="This unpaid invoice will be marked as void. Its billing history will remain available."
+          recordLabel="Selected invoice"
+          recordName={voidTarget.patient}
+          recordMeta={`${voidTarget.service} · ${money(voidTarget.amount)} · ${voidTarget.id}`}
+          warning="This invoice will be excluded from active billing totals."
+          confirmLabel="Void invoice"
+          pendingLabel="Voiding…"
+          error={state.error}
+          onClose={() => setVoidTarget(null)}
+          onConfirm={() => {
+            assertUnchangedRecord(state.records, voidTarget);
+            const current = state.records.find((record) => record.id === voidTarget.id);
+            if (!current || current.voided || current.paid) {
+              throw new Error("Only an active unpaid invoice can be voided. Refresh the invoices and try again.");
+            }
+            return state.save(
+              state.records.map((record) =>
+                record.id === voidTarget.id ? { ...record, voided: true } : record,
+              ),
+            );
+          }}
+        />
       )}
     </Page>
   );

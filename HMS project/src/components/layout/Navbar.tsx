@@ -277,7 +277,7 @@ export default function Navbar({
                   id="hms-account-panel"
                   role="dialog"
                   aria-label="Account navigation"
-                  className="fixed left-3 right-3 top-[78px] z-50 flex max-h-[calc(100dvh-100px)] flex-col overflow-hidden rounded-[18px] border border-[var(--hms-border)] bg-[var(--hms-surface)] text-[var(--hms-text)] shadow-[0_20px_60px_rgba(0,0,0,0.18)] sm:absolute sm:left-auto sm:right-0 sm:top-[52px] sm:w-[320px]"
+                  className="fixed left-3 right-3 top-[78px] z-50 flex h-[calc(100dvh-78px)] max-h-[calc(100dvh-78px)] flex-col overflow-hidden rounded-[18px] border border-[var(--hms-border)] bg-[var(--hms-surface)] text-[var(--hms-text)] shadow-[0_20px_60px_rgba(0,0,0,0.18)] sm:absolute sm:left-auto sm:right-0 sm:top-[52px] sm:h-auto sm:max-h-[calc(100dvh-100px)] sm:w-[320px]"
                 >
                   <div className="flex shrink-0 items-center gap-3 border-b border-[var(--hms-border)] px-4 py-4">
                     <AccountAvatar
@@ -316,7 +316,7 @@ export default function Navbar({
                   </label>
                   <nav
                     aria-label="All hospital pages"
-                    className="min-h-0 overflow-y-auto overscroll-contain px-2 pb-3"
+                    className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-2 pb-3 sm:flex-initial"
                   >
                     {sections.length ? (
                       sections.map((section) => (

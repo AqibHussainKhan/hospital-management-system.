@@ -4,7 +4,9 @@ import type { FormEvent } from "react";
 import { useSearchParams } from "react-router-dom";
 import { BarChart3, Plus, CalendarDays, TrendingUp } from "lucide-react";
 import Layout from "../../components/layout/Layout";
+import DeleteConfirmationModal from "../../components/common/DeleteConfirmationModal";
 import VisitChart from "../../components/dashboard/VisitChart";
+import { assertUnchangedRecord } from "../../data/recordCore";
 import {
   useVisits,
   useToday,
@@ -21,6 +23,7 @@ export default function PatientAnalytics({
   const today = useToday();
   const patients = usePatients();
   const { records, save, error } = useVisits();
+  const [deleteTarget, setDeleteTarget] = useState<(typeof records)[number] | null>(null);
   const [params, setParams] = useSearchParams();
   const [range, setRange] = useState(30);
   const day = isDate(params.get("day")) ? params.get("day") : null;
@@ -235,10 +238,7 @@ export default function PatientAnalytics({
                     <td className="px-5 py-4">
                       <button
                         className="text-xs text-red-500"
-                        onClick={() => {
-                          if (window.confirm(`Delete visit for ${v.patient}?`))
-                            save(records.filter((r) => r.id !== v.id));
-                        }}
+                        onClick={() => setDeleteTarget(v)}
                       >
                         Delete
                       </button>
@@ -255,6 +255,22 @@ export default function PatientAnalytics({
           </div>
         </section>
       </div>
+      {deleteTarget && (
+        <DeleteConfirmationModal
+          title="Delete visit?"
+          description="This visit will be removed from the patient's visit history and analytics."
+          recordLabel="Selected visit"
+          recordName={deleteTarget.patient}
+          recordMeta={`${dateLabel(deleteTarget.date)} · ${deleteTarget.id}`}
+          confirmLabel="Delete visit"
+          error={error}
+          onClose={() => setDeleteTarget(null)}
+          onConfirm={() => {
+            assertUnchangedRecord(records, deleteTarget);
+            return save(records.filter((record) => record.id !== deleteTarget.id));
+          }}
+        />
+      )}
     </Layout>
   );
 }
