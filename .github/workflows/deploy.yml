@@ -1,0 +1,68 @@
+name: Publish HMS Website
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: hms-pages
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: "HMS project"
+
+    environment:
+      name: github-pages
+      url: ${{ steps.release.outputs.page_url }}
+
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v7
+
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: "HMS project/package-lock.json"
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v6
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build website
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+          VITE_HMS_DATA_MODE: supabase
+        run: |
+          if [ -z "$VITE_SUPABASE_URL" ] || [ -z "$VITE_SUPABASE_PUBLISHABLE_KEY" ]; then
+            echo "Add both Supabase values in repository Actions secrets."
+            exit 1
+          fi
+          npm run build -- --base="/${GITHUB_REPOSITORY#*/}/"
+
+      - name: Add React route fallback
+        run: cp dist/index.html dist/404.html
+
+      - name: Upload website
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: "HMS project/dist"
+
+      - name: Deploy website
+        id: release
+        uses: actions/deploy-pages@v5
