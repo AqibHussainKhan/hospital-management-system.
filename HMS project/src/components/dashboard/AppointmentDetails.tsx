@@ -1,9 +1,96 @@
 import { useState } from "react";
+
 import DashboardDialog from "./DashboardDialog";
+
 import { dateLabel } from "../../data/dashboardStore";
 import type { AppointmentRecord } from "../../data/dashboardStore";
-export const statusClass = (status: AppointmentRecord["status"]) => status === "Completed" ? "bg-emerald-500/10 text-emerald-500" : status === "Cancelled" ? "bg-red-500/10 text-red-500" : status === "Waiting" ? "bg-amber-500/10 text-amber-500" : "bg-blue-500/10 text-blue-500";
-export default function AppointmentDetails({ appointment, onClose, onStatus }: { appointment: AppointmentRecord; onClose: () => void; onStatus: (status: AppointmentRecord["status"]) => Promise<boolean> }) {
+
+export const statusClass = (status: AppointmentRecord["status"]) =>
+  status === "Completed"
+    ? "bg-emerald-500/10 text-emerald-500"
+    : status === "Cancelled"
+      ? "bg-red-500/10 text-red-500"
+      : status === "Waiting"
+        ? "bg-amber-500/10 text-amber-500"
+        : "bg-blue-500/10 text-blue-500";
+
+export default function AppointmentDetails({
+  appointment,
+  onClose,
+  onStatus
+}: {
+  appointment: AppointmentRecord;
+  onClose: () => void;
+  onStatus: (status: AppointmentRecord["status"]) => Promise<boolean>
+}) {
   const [error, setError] = useState("");
-  return <DashboardDialog title="Appointment Details" onClose={onClose}><div className="mb-6 flex items-center gap-4"><span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-500/10 text-lg font-semibold text-blue-500">{appointment.initials}</span><div><h3 className="text-xl font-semibold">{appointment.patient}</h3><p className="mt-1 text-xs text-[var(--hms-text-muted)]">{appointment.appointmentId}</p></div></div><dl className="grid gap-5 sm:grid-cols-2">{[["Doctor", appointment.doctor], ["Department", appointment.department], ["Date", dateLabel(appointment.date)], ["Time (Pakistan)", appointment.time]].map(([key, value]) => <div key={key} className="rounded-xl bg-[var(--hms-surface-secondary)] p-4"><dt className="text-xs text-[var(--hms-text-muted)]">{key}</dt><dd className="mt-2 text-sm font-medium">{value}</dd></div>)}</dl><label className="mt-6 block text-sm font-medium">Appointment status<select className="mt-2 w-full rounded-xl border border-[var(--hms-border)] bg-[var(--hms-surface-secondary)] p-3" value={appointment.status} onChange={async e => setError(await onStatus(e.target.value as AppointmentRecord["status"]) ? "" : "Status could not be saved. Check the schedule and connection.")}>{["Confirmed", "Waiting", "Completed", "Cancelled"].map(s => <option key={s}>{s}</option>)}</select></label>{error && <p role="alert" className="mt-3 text-sm text-red-500">{error}</p>}<p className="mt-3 text-xs text-[var(--hms-text-muted)]">Status updates save immediately. Recording a patient visit is a separate action in analytics.</p></DashboardDialog>;
+
+  return (
+    <DashboardDialog title="Appointment Details" onClose={onClose}>
+      <div className="mb-6 flex items-center gap-4">
+        <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-500/10 text-lg font-semibold text-blue-500">
+          {appointment.initials}
+        </span>
+
+        <div>
+          <h3 className="text-xl font-semibold">
+            {appointment.patient}
+          </h3>
+
+          <p className="mt-1 text-xs text-[var(--hms-text-muted)]">
+            {appointment.appointmentId}
+          </p>
+        </div>
+      </div>
+
+      <dl className="grid gap-5 sm:grid-cols-2">
+        {[
+          ["Doctor", appointment.doctor],
+          ["Department", appointment.department],
+          ["Date", dateLabel(appointment.date)],
+          ["Time (Pakistan)", appointment.time]
+        ].map(([key, value]) => (
+          <div
+            key={key}
+            className="rounded-xl bg-[var(--hms-surface-secondary)] p-4"
+          >
+            <dt className="text-xs text-[var(--hms-text-muted)]">
+              {key}
+            </dt>
+
+            <dd className="mt-2 text-sm font-medium">{value}</dd>
+          </div>
+        ))}
+      </dl>
+
+      <label className="mt-6 block text-sm font-medium">
+        Appointment status
+        <select
+          className="mt-2 w-full rounded-xl border border-[var(--hms-border)] bg-[var(--hms-surface-secondary)] p-3"
+          value={appointment.status}
+          onChange={async e =>
+            setError(
+              await onStatus(e.target.value as AppointmentRecord["status"])
+                ? ""
+                : "Status could not be saved. Check the schedule and connection."
+            )
+          }
+        >
+          {["Confirmed", "Waiting", "Completed", "Cancelled"].map(s => (
+            <option key={s}>{s}</option>
+          ))}
+        </select>
+      </label>
+
+      {error && (
+        <p role="alert" className="mt-3 text-sm text-red-500">
+          {error}
+        </p>
+      )}
+
+      <p className="mt-3 text-xs text-[var(--hms-text-muted)]">
+        Status updates save immediately. Recording a patient visit is a separate action in analytics.
+      </p>
+    </DashboardDialog>
+  );
 }

@@ -20,6 +20,7 @@ import {
   Users,
 } from "lucide-react";
 import Layout from "../../components/layout/Layout";
+import DashboardFooter from "../../components/layout/DashboardFooter";
 import HeroCarousel from "../../components/dashboard/HeroCarousel";
 import DoctorsSection from "../../components/dashboard/DoctorsSection";
 import HospitalNews from "../../components/dashboard/HospitalNews";
@@ -48,7 +49,7 @@ function Dashboard({
       subtitle="Hospital overview and daily operations"
       onLogout={onLogout}
     >
-      <div className="mx-auto w-full min-w-0 max-w-[1600px] space-y-8 overflow-x-hidden pb-10">
+      <div id="dashboard-overview" tabIndex={-1} className="relative mx-auto w-full min-w-0 max-w-[1600px] space-y-8 overflow-x-hidden focus:outline-none">
         {/* =========================
                 HERO CAROUSEL
           ========================== */}
@@ -144,6 +145,7 @@ function Dashboard({
             HOSPITAL LOCATION MAP
           ========================== */}
                <Suspense fallback={<p className="text-sm text-[var(--hms-text-muted)]">Loading hospital location…</p>}><HospitalMap /></Suspense>
+        <DashboardFooter />
       </div>
     </Layout>
   );

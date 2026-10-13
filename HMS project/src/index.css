@@ -2,6 +2,10 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* =========================================================
+   BASE
+========================================================= */
+
 * {
   box-sizing: border-box;
 }
@@ -14,13 +18,11 @@ body,
   min-height: 100vh;
 }
 
-body {
-  font-family: "Inter", system-ui, sans-serif;
-}
-
 button,
-input {
-  font-family: inherit;
+input,
+textarea,
+select {
+  font: inherit;
 }
 
 button {
@@ -46,117 +48,70 @@ button {
   border-radius: 20px;
 }
 
-
 /* =========================================================
-   HMS THEME SYSTEM
+   LIGHT THEME
 ========================================================= */
 
 :root {
   color-scheme: light;
 
-  /* Main backgrounds */
   --hms-bg: #f5f8fc;
   --hms-sidebar: #ffffff;
   --hms-navbar: rgba(255, 255, 255, 0.88);
 
-  /* Surface */
   --hms-surface: #ffffff;
   --hms-surface-secondary: #f8fafc;
   --hms-surface-hover: #f1f5f9;
 
-  /* Borders */
   --hms-border: rgba(15, 23, 42, 0.08);
   --hms-border-strong: rgba(15, 23, 42, 0.12);
 
-  /* Text */
   --hms-text: #0f172a;
   --hms-text-secondary: #475569;
   --hms-text-muted: #64748b;
 
-  /* Medical brand */
   --hms-primary: #2563eb;
   --hms-primary-hover: #1d4ed8;
   --hms-primary-soft: rgba(37, 99, 235, 0.08);
 
-  /* Medical status */
   --hms-success: #059669;
   --hms-warning: #d97706;
   --hms-danger: #dc2626;
 
-  /* Shadow */
-  --hms-shadow:
-    0 18px 45px rgba(15, 23, 42, 0.06);
+  --hms-shadow: 0 18px 45px rgba(15, 23, 42, 0.06);
 }
 
 /* =========================================================
-   DARK HOSPITAL THEME
+   DARK THEME
 ========================================================= */
 
 html[data-theme="dark"] {
   color-scheme: dark;
 
-  /*
-    Premium Medical Dark Theme
-
-    Base:
-    Deep midnight hospital navy
-
-    Accent:
-    Medical blue + subtle cyan
-
-    Status:
-    Emerald clinical green
-  */
-
   --hms-bg: #050b14;
-
   --hms-sidebar: #081421;
-
-  --hms-navbar:
-    rgba(7, 17, 31, 0.88);
+  --hms-navbar: rgba(7, 17, 31, 0.88);
 
   --hms-surface: #0b1725;
+  --hms-surface-secondary: #0e1b2b;
+  --hms-surface-hover: #122033;
 
-  --hms-surface-secondary:
-    #0e1b2b;
-
-  --hms-surface-hover:
-    #122033;
-
-  --hms-border:
-    rgba(148, 163, 184, 0.08);
-
-  --hms-border-strong:
-    rgba(148, 163, 184, 0.13);
+  --hms-border: rgba(148, 163, 184, 0.08);
+  --hms-border-strong: rgba(148, 163, 184, 0.13);
 
   --hms-text: #f8fafc;
+  --hms-text-secondary: #94a3b8;
+  --hms-text-muted: #9aabc1;
 
-  --hms-text-secondary:
-    #94a3b8;
+  --hms-primary: #3b82f6;
+  --hms-primary-hover: #60a5fa;
+  --hms-primary-soft: rgba(59, 130, 246, 0.09);
 
-  --hms-text-muted:
-    #9aabc1;
+  --hms-success: #34d399;
+  --hms-warning: #fbbf24;
+  --hms-danger: #fb7185;
 
-  --hms-primary:
-    #3b82f6;
-
-  --hms-primary-hover:
-    #60a5fa;
-
-  --hms-primary-soft:
-    rgba(59, 130, 246, 0.09);
-
-  --hms-success:
-    #34d399;
-
-  --hms-warning:
-    #fbbf24;
-
-  --hms-danger:
-    #fb7185;
-
-  --hms-shadow:
-    0 20px 55px rgba(0, 0, 0, 0.22);
+  --hms-shadow: 0 20px 55px rgba(0, 0, 0, 0.22);
 }
 
 /* =========================================================
@@ -165,129 +120,715 @@ html[data-theme="dark"] {
 
 html {
   background: var(--hms-bg);
-
   transition:
     background-color 250ms ease,
     color 250ms ease;
 }
 
 body {
-  margin: 0;
-
-  background:
-    var(--hms-bg);
-
-  color:
-    var(--hms-text);
-
+  font-family: "Inter", system-ui, sans-serif;
+  background: var(--hms-bg);
+  color: var(--hms-text);
   transition:
     background-color 250ms ease,
     color 250ms ease;
 }
 
-* {
-  box-sizing: border-box;
-}
-
-button,
-input,
-textarea,
-select {
-  font: inherit;
+:focus-visible {
+  outline: 2px solid var(--hms-primary);
+  outline-offset: 3px;
 }
 
 /* =========================================================
-   REUSABLE HMS THEME CLASSES
+   REUSABLE THEME CLASSES
 ========================================================= */
 
 .hms-app {
-  background:
-    var(--hms-bg);
-
-  color:
-    var(--hms-text);
+  background: var(--hms-bg);
+  color: var(--hms-text);
 }
 
 .hms-sidebar {
-  background:
-    var(--hms-sidebar);
-
-  border-color:
-    var(--hms-border);
+  background: var(--hms-sidebar);
+  border-color: var(--hms-border);
 }
 
 .hms-navbar {
-  background:
-    var(--hms-navbar);
-
-  border-color:
-    var(--hms-border);
+  background: var(--hms-navbar);
+  border-color: var(--hms-border);
 }
 
 .hms-card {
-  background:
-    var(--hms-surface);
-
-  border:
-    1px solid
-    var(--hms-border);
-
-  box-shadow:
-    var(--hms-shadow);
-
-  color:
-    var(--hms-text);
+  background: var(--hms-surface);
+  border: 1px solid var(--hms-border);
+  box-shadow: var(--hms-shadow);
+  color: var(--hms-text);
 }
 
 .hms-card-soft {
-  background:
-    var(--hms-surface-secondary);
-
-  border:
-    1px solid
-    var(--hms-border);
+  background: var(--hms-surface-secondary);
+  border: 1px solid var(--hms-border);
 }
 
 .hms-muted {
-  color:
-    var(--hms-text-secondary);
+  color: var(--hms-text-secondary);
 }
 
 .hms-subtle {
-  color:
-    var(--hms-text-muted);
+  color: var(--hms-text-muted);
 }
 
 .hms-divider {
-  border-color:
-    var(--hms-border);
+  border-color: var(--hms-border);
 }
 
 .hms-input {
-  background:
-    var(--hms-surface-secondary);
-
-  border:
-    1px solid
-    var(--hms-border);
-
-  color:
-    var(--hms-text);
+  background: var(--hms-surface-secondary);
+  border: 1px solid var(--hms-border);
+  color: var(--hms-text);
+  caret-color: var(--hms-primary);
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
 }
 
-.hms-input::placeholder {
-  color:
-    var(--hms-text-muted);
+/* =========================================================
+   SEARCH BARS: NAVBAR AND OTHER PAGES
+========================================================= */
+
+.hms-search,
+.hms-navbar-search {
+  align-items: center;
+  gap: 10px;
+  height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--hms-border-strong);
+  border-radius: 14px;
+  background: var(--hms-surface-secondary);
+  color: var(--hms-text);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+  caret-color: var(--hms-primary);
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
 }
 
-.hms-input:focus {
+.hms-search > input,
+.hms-navbar-search .hms-navbar-search-input {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--hms-text);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+  caret-color: var(--hms-primary);
+}
+
+.hms-search > input,
+.hms-search > input:focus,
+.hms-search > input:focus-visible,
+.hms-navbar-search .hms-navbar-search-input,
+.hms-navbar-search .hms-navbar-search-input:focus,
+.hms-navbar-search .hms-navbar-search-input:focus-visible {
   outline: none;
-
-  border-color:
-    rgba(59, 130, 246, 0.5);
-
-  box-shadow:
-    0 0 0 4px
-    rgba(59, 130, 246, 0.08);
+  box-shadow: none;
 }
-:focus-visible { outline: 2px solid var(--hms-primary); outline-offset: 3px; }
+
+.hms-search > svg,
+.hms-navbar-search-icon {
+  flex-shrink: 0;
+  color: var(--hms-text-muted);
+}
+
+.hms-search:focus-within > svg,
+.hms-navbar-search:focus-within .hms-navbar-search-icon {
+  color: var(--hms-primary);
+}
+
+/* =========================================================
+   PATIENT FILTER AND EDIT / REGISTER / DETAILS FIELDS
+========================================================= */
+
+.hms-form-field,
+.hms-patient-status-filter {
+  min-width: 0;
+  height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--hms-border-strong);
+  border-radius: 14px;
+  background: var(--hms-surface-secondary);
+  color: var(--hms-text);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+  caret-color: var(--hms-primary);
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.hms-form-field {
+  display: block;
+  width: 100%;
+}
+
+.hms-patient-status-filter {
+  flex-shrink: 0;
+}
+
+textarea.hms-form-field {
+  height: auto;
+  min-height: 96px;
+  padding: 12px 14px;
+  resize: vertical;
+}
+
+/* =========================================================
+   SHARED FOCUS, PLACEHOLDER AND DISABLED STATES
+========================================================= */
+
+.hms-input:focus,
+.hms-input:focus-visible,
+.hms-search:focus-within,
+.hms-navbar-search:focus-within,
+.hms-form-field:focus,
+.hms-form-field:focus-visible,
+.hms-patient-status-filter:focus,
+.hms-patient-status-filter:focus-visible {
+  outline: none;
+  border-color: var(--hms-primary);
+  box-shadow: 0 0 0 2px var(--hms-primary-soft);
+}
+
+.hms-input::placeholder,
+.hms-search::placeholder,
+.hms-search > input::placeholder,
+.hms-navbar-search-input::placeholder,
+.hms-form-field::placeholder {
+  color: var(--hms-text-muted);
+  opacity: 1;
+}
+
+.hms-input:disabled,
+input.hms-search:disabled,
+.hms-navbar-search-input:disabled,
+.hms-form-field:disabled,
+.hms-patient-status-filter:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* =========================================================
+   ACCESSIBILITY
+========================================================= */
+
+@media (forced-colors: active) {
+  .hms-input:focus,
+  .hms-input:focus-visible,
+  .hms-search:focus-within,
+  .hms-navbar-search:focus-within,
+  .hms-form-field:focus,
+  .hms-form-field:focus-visible,
+  .hms-patient-status-filter:focus,
+  .hms-patient-status-filter:focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html,
+  body,
+  .hms-input,
+  .hms-search,
+  .hms-navbar-search,
+  .hms-form-field,
+  .hms-patient-status-filter {
+    transition: none;
+  }
+}
+
+/* Patient dialog fields also work with the original component classes. */
+dialog:is(
+    [aria-label="Edit Patient"],
+    [aria-label="Register Patient"],
+    [aria-label="Patient Details"]
+  )
+  :is(input, select, textarea) {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--hms-border-strong);
+  border-radius: 14px;
+  background: var(--hms-surface-secondary);
+  color: var(--hms-text);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+  caret-color: var(--hms-primary);
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+dialog:is(
+    [aria-label="Edit Patient"],
+    [aria-label="Register Patient"],
+    [aria-label="Patient Details"]
+  )
+  :is(input, select, textarea):is(:focus, :focus-visible) {
+  outline: none;
+  border-color: var(--hms-primary);
+  box-shadow: 0 0 0 2px var(--hms-primary-soft);
+}
+
+dialog:is(
+    [aria-label="Edit Patient"],
+    [aria-label="Register Patient"],
+    [aria-label="Patient Details"]
+  )
+  :is(input, textarea)::placeholder {
+  color: var(--hms-text-muted);
+  opacity: 1;
+}
+
+dialog:is(
+    [aria-label="Edit Patient"],
+    [aria-label="Register Patient"],
+    [aria-label="Patient Details"]
+  )
+  :is(input, select, textarea):disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+dialog:is(
+    [aria-label="Edit Patient"],
+    [aria-label="Register Patient"],
+    [aria-label="Patient Details"]
+  )
+  textarea {
+  height: auto;
+  min-height: 96px;
+  padding: 12px 14px;
+  resize: vertical;
+}
+
+@media (forced-colors: active) {
+  dialog:is(
+      [aria-label="Edit Patient"],
+      [aria-label="Register Patient"],
+      [aria-label="Patient Details"]
+    )
+    :is(input, select, textarea):is(:focus, :focus-visible) {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  dialog:is(
+      [aria-label="Edit Patient"],
+      [aria-label="Register Patient"],
+      [aria-label="Patient Details"]
+    )
+    :is(input, select, textarea) {
+    transition: none;
+  }
+}
+
+/* Shared department records: search and Add/Edit fields. */
+input:is(
+  [aria-label="Search Doctor Directory"],
+  [aria-label="Search Laboratory"],
+  [aria-label="Search Pharmacy Inventory"],
+  [aria-label="Search Wards & Beds"],
+  [aria-label="Search Operation Theater"],
+  [placeholder="Search records…"],
+  [placeholder="Search records..."]
+),
+dialog:is(
+    [aria-label^="Add "],
+    [aria-label="Edit Record"],
+    [aria-label="Record Details"]
+  )
+  :is(input:not([type="checkbox"], [type="radio"]), select, textarea) {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--hms-border-strong);
+  border-radius: 14px;
+  background: var(--hms-surface-secondary);
+  color: var(--hms-text);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+  caret-color: var(--hms-primary);
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+input:is(
+    [aria-label="Search Doctor Directory"],
+    [aria-label="Search Laboratory"],
+    [aria-label="Search Pharmacy Inventory"],
+    [aria-label="Search Wards & Beds"],
+    [aria-label="Search Operation Theater"],
+    [placeholder="Search records…"],
+    [placeholder="Search records..."]
+  ):is(:focus, :focus-visible),
+dialog:is(
+    [aria-label^="Add "],
+    [aria-label="Edit Record"],
+    [aria-label="Record Details"]
+  )
+  :is(input:not([type="checkbox"], [type="radio"]), select, textarea):is(
+    :focus,
+    :focus-visible
+  ) {
+  outline: none;
+  border-color: var(--hms-primary);
+  box-shadow: 0 0 0 2px var(--hms-primary-soft);
+}
+
+input:is(
+    [aria-label="Search Doctor Directory"],
+    [aria-label="Search Laboratory"],
+    [aria-label="Search Pharmacy Inventory"],
+    [aria-label="Search Wards & Beds"],
+    [aria-label="Search Operation Theater"],
+    [placeholder="Search records…"],
+    [placeholder="Search records..."]
+  )::placeholder,
+dialog:is(
+    [aria-label^="Add "],
+    [aria-label="Edit Record"],
+    [aria-label="Record Details"]
+  )
+  :is(input, textarea)::placeholder {
+  color: var(--hms-text-muted);
+  opacity: 1;
+}
+
+input:is(
+    [aria-label="Search Doctor Directory"],
+    [aria-label="Search Laboratory"],
+    [aria-label="Search Pharmacy Inventory"],
+    [aria-label="Search Wards & Beds"],
+    [aria-label="Search Operation Theater"],
+    [placeholder="Search records…"],
+    [placeholder="Search records..."]
+  ):disabled,
+dialog:is(
+    [aria-label^="Add "],
+    [aria-label="Edit Record"],
+    [aria-label="Record Details"]
+  )
+  :is(input, select, textarea):disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+dialog:is(
+    [aria-label^="Add "],
+    [aria-label="Edit Record"],
+    [aria-label="Record Details"]
+  )
+  textarea {
+  height: auto;
+  min-height: 96px;
+  padding: 12px 14px;
+  resize: vertical;
+}
+
+/* Search icon and responsive space for Add Record / Refresh buttons. */
+input:is(
+  [aria-label="Search Doctor Directory"],
+  [aria-label="Search Laboratory"],
+  [aria-label="Search Pharmacy Inventory"],
+  [aria-label="Search Wards & Beds"],
+  [aria-label="Search Operation Theater"],
+  [placeholder="Search records…"],
+  [placeholder="Search records..."]
+) {
+  flex: 1 1 260px;
+  width: auto;
+  padding-left: 40px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 14px center;
+  background-size: 16px 16px;
+}
+
+input:is(
+    [aria-label="Search Doctor Directory"],
+    [aria-label="Search Laboratory"],
+    [aria-label="Search Pharmacy Inventory"],
+    [aria-label="Search Wards & Beds"],
+    [aria-label="Search Operation Theater"],
+    [placeholder="Search records…"],
+    [placeholder="Search records..."]
+  ):focus {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
+}
+
+div:has(
+  > input:is(
+      [aria-label="Search Doctor Directory"],
+      [aria-label="Search Laboratory"],
+      [aria-label="Search Pharmacy Inventory"],
+      [aria-label="Search Wards & Beds"],
+      [aria-label="Search Operation Theater"],
+      [placeholder="Search records…"],
+      [placeholder="Search records..."]
+    )
+) {
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+div:has(
+    > input:is(
+        [aria-label="Search Doctor Directory"],
+        [aria-label="Search Laboratory"],
+        [aria-label="Search Pharmacy Inventory"],
+        [aria-label="Search Wards & Beds"],
+        [aria-label="Search Operation Theater"],
+        [placeholder="Search records…"],
+        [placeholder="Search records..."]
+      )
+  )
+  > button {
+  min-height: 44px;
+  flex-shrink: 0;
+}
+
+@media (forced-colors: active) {
+  input:is(
+      [aria-label="Search Doctor Directory"],
+      [aria-label="Search Laboratory"],
+      [aria-label="Search Pharmacy Inventory"],
+      [aria-label="Search Wards & Beds"],
+      [aria-label="Search Operation Theater"],
+      [placeholder="Search records…"],
+      [placeholder="Search records..."]
+    ):is(:focus, :focus-visible),
+  dialog:is(
+      [aria-label^="Add "],
+      [aria-label="Edit Record"],
+      [aria-label="Record Details"]
+    )
+    :is(input:not([type="checkbox"], [type="radio"]), select, textarea):is(
+      :focus,
+      :focus-visible
+    ) {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  input:is(
+    [aria-label="Search Doctor Directory"],
+    [aria-label="Search Laboratory"],
+    [aria-label="Search Pharmacy Inventory"],
+    [aria-label="Search Wards & Beds"],
+    [aria-label="Search Operation Theater"],
+    [placeholder="Search records…"],
+    [placeholder="Search records..."]
+  ),
+  dialog:is(
+      [aria-label^="Add "],
+      [aria-label="Edit Record"],
+      [aria-label="Record Details"]
+    )
+    :is(input:not([type="checkbox"], [type="radio"]), select, textarea) {
+    transition: none;
+  }
+}
+
+/* Appointments: search, filters, New/Edit fields and Details status. */
+:is(
+  input[aria-label="Search appointments"],
+  select[aria-label="Appointment status"],
+  input[aria-label="Appointment date filter"]
+),
+dialog:is(
+    [aria-label="New Appointment"],
+    [aria-label="Edit Appointment"],
+    [aria-label="Appointment Details"]
+  )
+  :is(input:not([type="checkbox"], [type="radio"]), select, textarea) {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--hms-border-strong);
+  border-radius: 14px;
+  background: var(--hms-surface-secondary);
+  color: var(--hms-text);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+  caret-color: var(--hms-primary);
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+:is(
+  input[aria-label="Search appointments"],
+  select[aria-label="Appointment status"],
+  input[aria-label="Appointment date filter"]
+):is(:focus, :focus-visible),
+dialog:is(
+    [aria-label="New Appointment"],
+    [aria-label="Edit Appointment"],
+    [aria-label="Appointment Details"]
+  )
+  :is(input:not([type="checkbox"], [type="radio"]), select, textarea):is(
+    :focus,
+    :focus-visible
+  ) {
+  outline: none;
+  border-color: var(--hms-primary);
+  box-shadow: 0 0 0 2px var(--hms-primary-soft);
+}
+
+input[aria-label="Search appointments"]::placeholder,
+dialog:is(
+    [aria-label="New Appointment"],
+    [aria-label="Edit Appointment"],
+    [aria-label="Appointment Details"]
+  )
+  :is(input, textarea)::placeholder {
+  color: var(--hms-text-muted);
+  opacity: 1;
+}
+
+:is(
+  input[aria-label="Search appointments"],
+  select[aria-label="Appointment status"],
+  input[aria-label="Appointment date filter"]
+):disabled,
+dialog:is(
+    [aria-label="New Appointment"],
+    [aria-label="Edit Appointment"],
+    [aria-label="Appointment Details"]
+  )
+  :is(input, select, textarea):disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+dialog:is(
+    [aria-label="New Appointment"],
+    [aria-label="Edit Appointment"],
+    [aria-label="Appointment Details"]
+  )
+  textarea {
+  height: auto;
+  min-height: 96px;
+  padding: 12px 14px;
+  resize: vertical;
+}
+
+input[aria-label="Search appointments"] {
+  padding-left: 40px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 14px center;
+  background-size: 16px 16px;
+}
+
+input[aria-label="Search appointments"]:focus {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
+}
+
+input[aria-label="Appointment date filter"] + button {
+  min-height: 44px;
+  border-radius: 14px;
+}
+
+@media (forced-colors: active) {
+  :is(
+    input[aria-label="Search appointments"],
+    select[aria-label="Appointment status"],
+    input[aria-label="Appointment date filter"]
+  ):is(:focus, :focus-visible),
+  dialog:is(
+      [aria-label="New Appointment"],
+      [aria-label="Edit Appointment"],
+      [aria-label="Appointment Details"]
+    )
+    :is(input:not([type="checkbox"], [type="radio"]), select, textarea):is(
+      :focus,
+      :focus-visible
+    ) {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :is(
+    input[aria-label="Search appointments"],
+    select[aria-label="Appointment status"],
+    input[aria-label="Appointment date filter"]
+  ),
+  dialog:is(
+      [aria-label="New Appointment"],
+      [aria-label="Edit Appointment"],
+      [aria-label="Appointment Details"]
+    )
+    :is(input:not([type="checkbox"], [type="radio"]), select, textarea) {
+    transition: none;
+  }
+}
+
+/* Printed receipts retain readable colours in either theme. */
+@media print {
+  body:has([data-hms-receipt]) * {
+    visibility: hidden;
+  }
+  body:has([data-hms-receipt]) [data-hms-receipt],
+  body:has([data-hms-receipt]) [data-hms-receipt] * {
+    visibility: visible;
+  }
+  [data-hms-receipt] {
+    position: fixed;
+    inset: 0;
+    padding: 24px;
+    background: white;
+    color: #0f172a;
+  }
+  [data-hms-receipt] * {
+    color: #0f172a;
+    background: white;
+  }
+}

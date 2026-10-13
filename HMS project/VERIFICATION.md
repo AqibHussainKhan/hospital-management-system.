@@ -1,33 +1,29 @@
-# Verification — 4 October 2026
+# Verification — Admin and Staff Release
 
-## Automated checks
+Verified locally on 12 October 2026 with Node 24.19.0.
 
-- Source lint: passed (`oxlint src vite.config.ts`). Dependencies are excluded from lint.
-- Strict TypeScript and Vite production build: passed.
-- `npm test`: 30 reported tests passed, 0 failed.
-- PostgreSQL-compatible PGlite ran the actual supplied migration twice to check rerun safety.
-- Database checks verified anonymous denial, signed-in non-admin denial, prevention of self-promotion, admin reads, denial of direct table writes, revision conflicts, ward limits, protected references, appointment clashes, immutable receipts, append-only audit access and atomic legacy import with preserved opening balances.
-- Application regression checks covered corrupt browser data, account resets, stale additions/edits/deletes, JSONB field ordering, exact decimal-to-paisa conversion, overnight shifts, date/time validation, notification date rollover, undated payment balances and maintenance-bed capacity.
+## Completed checks
 
-## Browser checks
+| Check | Result |
+| --- | --- |
+| `npm run check` | Passed: lint, all tests, TypeScript and Vite production build |
+| Test suite | 58 tests passed; 0 failures, cancellations or skipped tests |
+| Final targeted roles suite after additional scope assertions | 19 tests passed; 0 failures |
+| Edge Function strict type check | Passed with equivalent npm import and minimal Deno runtime declarations |
+| ZIP integrity | CRC and file-set checked during packaging; real env files, dependencies and build output excluded |
 
-Headless Chromium exercised the production build using synthetic users and records. Supabase HTTP endpoints were intercepted: authentication responses were mocked, and record reads/writes ran against the supplied SQL in a local PGlite database. No real account, credential, patient data or hosted Supabase project was used.
+Source lint has nonfatal React warnings; there are no lint errors. The production build passed without suppressing TypeScript errors.
 
-Passed: sign-in and dashboard; doctor creation/detail dialog; linked patient registration; linked appointment booking; linked laboratory request; invoice creation and payment receipt (the persisted paid amount was asserted in the database); pharmacy, wards, theater, staff, attendance, reports, analytics, settings and profile routes; mobile navigation opening and Escape dismissal; manual dark/light theme; no uncaught browser page errors.
+## What the tests establish
 
-External photos/fonts were blocked during browser checks, so screenshots used their fallback appearance. Live OAuth, recovery email delivery, hospital map coordinates, deployment redirects and your hosted database configuration require your own configured environment.
+The local PostgreSQL-compatible PGlite tests model Supabase auth identities, roles and RLS. They exercise migration install/rerun, revoked private helpers, server role scopes, projected patient privacy, department/ward assignments, upcoming appointment/surgery care access, OT patient selection, lab queue/report policies, stale/null revisions, hidden-record preservation and immutable clinical/financial history.
 
-## Production output
+They also exercise atomic medicine dispensing, quantity/expiry/receipt rules, unpaid invoice void approval, personal leave and attendance access, self-approval denial, workforce corrections, overnight/overlapping shifts, role deactivation, permission revocation, backup/audit access and protection of the last administrator. Store tests cover late responses after scope changes, cleared denied data, conflicts, money/date/shift bounds, occupancy and notifications.
 
-The entry JavaScript file is about 55 kB minified, with separate React, animation and Supabase vendor chunks plus route/map chunks. The largest emitted JavaScript chunk is about 259 kB. No CSS import-order or large-chunk warning remains. Separate vendor chunks are still downloaded when required; 55 kB is not the total cold-start download size.
+## Browser evidence and limits
 
-## Scope
+Earlier checks in this implementation exercised 12 roles across 51 page views using a headless browser and intercepted synthetic Supabase responses, with zero page JavaScript errors. Light/dark search focus, dialogs, account permissions, mobile navigation and notifications were inspected. These fixtures did not send real messages or change a hosted database.
 
-The release provides working shared records and guarded database persistence for the existing administrator app. It does not claim a full hospital ERP, live-provider verification or a regulatory certification. Product/architecture extensions such as granular clinical roles, physical bed-transfer history, inventory movement accounting and an announcements CMS are described in README.md.
+The final browser rerun after the last refinements could not launch because the native Chromium process crashed before opening the app. The final code was subsequently verified by the test suite, role tests, strict type checking and production build; a fresh real-browser check on the user's deployment remains necessary. No final hosted-browser smoke test is claimed.
 
-Official references used for implementation:
-- Supabase RLS: https://supabase.com/docs/guides/database/postgres/row-level-security
-- Supabase database functions: https://supabase.com/docs/guides/database/functions
-- Tailwind selector-based dark mode: https://tailwindcss.com/docs/dark-mode
-- React lazy: https://react.dev/reference/react/lazy
-- Rolldown splitting: https://rolldown.rs/reference/OutputOptions.codeSplitting
+The Edge Function was type-checked locally, not deployed or executed against hosted Supabase. Hosted SQL migrations, Storage behavior on the actual project, real account onboarding, Google OAuth and invitation/reset email delivery still need the setup and acceptance checks in SETUP_Roman_Urdu.md.

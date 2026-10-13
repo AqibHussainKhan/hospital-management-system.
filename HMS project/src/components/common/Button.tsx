@@ -15,13 +15,11 @@ type ButtonVariant =
 
 type ButtonSize = "sm" | "md" | "lg";
 
-interface ButtonProps
-  extends ButtonHTMLAttributes<HTMLButtonElement> {
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
 
   variant?: ButtonVariant;
   size?: ButtonSize;
-
   loading?: boolean;
 
   leftIcon?: ReactNode;
@@ -30,10 +28,7 @@ interface ButtonProps
   fullWidth?: boolean;
 }
 
-const Button = forwardRef<
-  HTMLButtonElement,
-  ButtonProps
->(
+const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {
       children,
@@ -50,10 +45,7 @@ const Button = forwardRef<
     },
     ref
   ) => {
-    const variants: Record<
-      ButtonVariant,
-      string
-    > = {
+    const variants: Record<ButtonVariant, string> = {
       primary:
         "border-blue-500 bg-blue-600 text-white shadow-[0_8px_24px_rgba(37,99,235,0.18)] hover:bg-blue-500",
 
@@ -82,36 +74,21 @@ const Button = forwardRef<
         type={type}
         disabled={disabled || loading}
         className={`
-          inline-flex items-center justify-center
-          gap-2
-          border
-          font-semibold
-          outline-none
-          transition-all duration-200
-
-          focus-visible:ring-2
-          focus-visible:ring-blue-500/40
-          focus-visible:ring-offset-2
-          focus-visible:ring-offset-[#071321]
-
-          disabled:cursor-not-allowed
-          disabled:opacity-50
-
+          inline-flex items-center justify-center gap-2 border font-semibold
+          outline-none transition-all duration-200
+          focus-visible:ring-2 focus-visible:ring-blue-500/40
+          focus-visible:ring-offset-2 focus-visible:ring-offset-[#071321]
+          disabled:cursor-not-allowed disabled:opacity-50
           active:scale-[0.98]
-
           ${variants[variant]}
           ${sizes[size]}
-
           ${fullWidth ? "w-full" : ""}
           ${className}
         `}
         {...props}
       >
         {loading ? (
-          <LoaderCircle
-            size={16}
-            className="animate-spin"
-          />
+          <LoaderCircle size={16} className="animate-spin" />
         ) : (
           leftIcon
         )}

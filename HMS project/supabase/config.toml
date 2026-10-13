@@ -1,0 +1,5 @@
+project_id = "medicore-hms"
+
+[functions.hms-users]
+# The function verifies the bearer token with Auth and checks current admin membership.
+verify_jwt = false

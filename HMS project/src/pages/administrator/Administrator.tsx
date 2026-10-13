@@ -1,19 +1,171 @@
-import DataTools from "../../components/administration/DataTools";
 import { useState } from "react";
-import type { FormEvent } from "react";
-import { Mail, UserRound, Save, ShieldCheck } from "lucide-react";
+import { Mail, ShieldCheck, Save, KeyRound } from "lucide-react";
 import type { User } from "../../App";
 import { AccountAvatar } from "../../context/AccountContext";
-import Layout from "../../components/layout/Layout";
-const input = "w-full rounded-xl border border-[var(--hms-border)] bg-[var(--hms-surface-secondary)] px-4 py-3 text-sm text-[var(--hms-text)] outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10";
-export default function Administrator({ user, onLogout }: { user: User; onLogout: () => void }) {
-  const key = `medicore.profile.v1:${user.email.toLowerCase()}`;
-  const [form, setForm] = useState(() => { const defaults = { phone: "", department: "Administration", bio: "" }; try { const saved = JSON.parse(localStorage.getItem(key) || "{}"); return Object.fromEntries(Object.entries(defaults).map(([k, v]) => [k, typeof saved?.[k] === "string" ? saved[k] : v])) as typeof defaults; } catch { return defaults; } });
-  const [message, setMessage] = useState(""); const [error, setError] = useState(false);
-  function save(e: FormEvent) { e.preventDefault(); try { localStorage.setItem(key, JSON.stringify(form)); setError(false); setMessage("Profile contact details saved."); } catch { setError(true); setMessage("Could not save profile. Check browser storage."); } }
-  return <Layout activePage="/administrator" title="My Profile" subtitle="Your signed-in account and contact details" onLogout={onLogout}><div className="mx-auto max-w-[1200px] space-y-6 pb-10 text-[var(--hms-text)]"><header><p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-blue-500">Account Center</p><h1 className="text-3xl font-semibold tracking-tight">My Profile</h1><p className="mt-2 text-sm text-[var(--hms-text-muted)]">Manage your contact details and view the account you signed in with.</p></header>
-    <section className="hms-card relative overflow-hidden rounded-[28px] border border-[var(--hms-border)]"><div className="h-24 bg-gradient-to-r from-blue-500/15 via-cyan-500/10 to-indigo-500/15" /><div className="relative px-6 pb-6 sm:px-8"><AccountAvatar user={user} className="-mt-10 h-20 w-20 rounded-[24px] border-4 border-[var(--hms-surface)] text-2xl shadow-sm" /><div className="mt-4 flex flex-col justify-between gap-4 sm:flex-row sm:items-center"><div className="min-w-0"><h2 className="break-words text-2xl font-semibold tracking-tight">{user.name || user.email}</h2><p className="mt-2 flex items-center gap-2 break-all text-sm text-[var(--hms-text-muted)]"><Mail size={15} className="shrink-0" />{user.email}</p></div><span className="flex w-fit items-center gap-2 rounded-full bg-emerald-500/10 px-4 py-2 text-xs font-medium text-emerald-500"><ShieldCheck size={15} />Signed-in account</span></div></div></section>
-    <div className="grid gap-6 lg:grid-cols-[1fr_300px]"><section className="hms-card rounded-[24px] p-6"><h2 className="mb-6 flex items-center gap-2 text-lg font-semibold"><UserRound size={18} className="text-blue-500" />Account Details</h2><form onSubmit={save} className="grid gap-5 sm:grid-cols-2"><label className="space-y-2 text-xs font-medium"><span className="block">Account name</span><input readOnly value={user.name || ""} className={`${input} opacity-75`} /></label><label className="space-y-2 text-xs font-medium"><span className="block">Login email</span><input readOnly value={user.email} className={`${input} opacity-75`} /></label>{(["phone", "department"] as const).map(k => <label key={k} className="space-y-2 text-xs font-medium"><span className="block">{k === "phone" ? "Phone number" : "Department"}</span><input type={k === "phone" ? "tel" : "text"} maxLength={100} className={input} value={form[k]} onChange={e => { setForm({ ...form, [k]: e.target.value }); setMessage(""); }} /></label>)}<label className="space-y-2 text-xs font-medium sm:col-span-2"><span className="block">About</span><textarea rows={4} maxLength={500} className={input} value={form.bio} onChange={e => { setForm({ ...form, bio: e.target.value }); setMessage(""); }} /></label><button className="flex w-fit items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-500"><Save size={16} />Save Details</button>{message && <p role={error ? "alert" : "status"} className={`rounded-xl p-3 text-sm sm:col-span-2 ${error ? "bg-red-500/10 text-red-500" : "bg-emerald-500/10 text-emerald-500"}`}>{message}</p>}</form></section><aside className="hms-card-soft h-fit rounded-[24px] p-6"><h2 className="font-semibold">Your Login Identity</h2><p className="mt-3 text-sm leading-7 text-[var(--hms-text-muted)]">Your name, email and photo come from the account used to sign in. They are shown consistently in the sidebar, navbar and profile.</p><p className="mt-4 text-xs leading-6 text-[var(--hms-text-muted)]">Contact details save in this browser. Changing your department does not change account permissions.</p></aside></div>
-    <DataTools />
-  </div></Layout>;
+import { useAccess } from "../../features/access/useAccess";
+import { useHospitalAuth } from "../../features/auth/HospitalAuthProvider";
+import { callRpc, useHospitalRpc } from "../../features/access/rpc";
+import {
+  Page,
+  Card,
+  Field,
+  ErrorMessage,
+  buttonClass,
+} from "../../components/administration/shared";
+import { secondaryButton } from "../../components/common/WorkspaceControls";
+import DataTools from "../../components/administration/DataTools";
+export default function Administrator({
+  user,
+  onLogout,
+}: {
+  user: User;
+  onLogout: () => void;
+}) {
+  const access = useAccess(),
+    auth = useHospitalAuth(),
+    state = useHospitalRpc<{ phone: string; bio: string }>(
+      "hms_personal_profile",
+    );
+  const [draft, setForm] = useState<{ phone: string; bio: string } | null>(
+      null,
+    ),
+    [busy, setBusy] = useState(false),
+    [notice, setNotice] = useState(""),
+    [error, setError] = useState("");
+  const form = draft || state.data || { phone: "", bio: "" },
+    loaded = !!state.data;
+  return (
+    <Page
+      path="/administrator"
+      title="My Profile"
+      subtitle="Your hospital account, contact details and password"
+      onLogout={onLogout}
+    >
+      <Card>
+        <div className="flex flex-wrap items-center gap-5">
+          <AccountAvatar
+            user={user}
+            className="h-20 w-20 rounded-[24px] text-2xl"
+          />
+          <div className="min-w-0 flex-1">
+            <h2 className="text-2xl font-semibold">{user.name}</h2>
+            <p className="mt-2 flex items-center gap-2 break-all text-sm text-[var(--hms-text-muted)]">
+              <Mail size={15} />
+              {user.email}
+            </p>
+          </div>
+          <span className="flex items-center gap-2 rounded-full bg-blue-500/10 px-4 py-2 text-xs text-blue-500">
+            <ShieldCheck size={15} />
+            {access.label}
+          </span>
+        </div>
+      </Card>
+      <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
+        <Card>
+          <h2 className="mb-6 text-lg font-semibold">Contact details</h2>
+          <form
+            className="space-y-5"
+            onSubmit={(event) => {
+              event.preventDefault();
+              if (busy) return;
+              setBusy(true);
+              setError("");
+              setNotice("");
+              void callRpc("hms_personal_profile", {
+                next_phone: form.phone,
+                next_bio: form.bio,
+              })
+                .then(() => {
+                  setNotice("Profile saved.");
+                  state.refresh();
+                })
+                .catch((cause: Error) => setError(cause.message))
+                .finally(() => setBusy(false));
+            }}
+          >
+            <div className="grid gap-5 sm:grid-cols-2">
+              <Field label="Name">
+                <input className="hms-form-field" readOnly value={user.name} />
+              </Field>
+              <Field label="Assigned department">
+                <input
+                  readOnly
+                  className="hms-form-field"
+                  value={access.department || "Administration"}
+                />
+              </Field>
+              <Field label="Phone">
+                <input
+                  disabled={busy}
+                  type="tel"
+                  maxLength={100}
+                  className="hms-form-field"
+                  value={form.phone}
+                  onChange={(event) =>
+                    setForm({ ...form, phone: event.target.value })
+                  }
+                />
+              </Field>
+              <Field label="Access role">
+                <input
+                  readOnly
+                  className="hms-form-field"
+                  value={access.label}
+                />
+              </Field>
+            </div>
+            <Field label="About">
+              <textarea
+                disabled={busy}
+                rows={4}
+                maxLength={1000}
+                className="hms-form-field"
+                value={form.bio}
+                onChange={(event) =>
+                  setForm({ ...form, bio: event.target.value })
+                }
+              />
+            </Field>
+            <button className={buttonClass} disabled={busy || !loaded}>
+              <Save size={15} className="mr-2 inline" />
+              {busy ? "Saving…" : "Save details"}
+            </button>
+          </form>
+        </Card>
+        <Card>
+          <h2 className="flex items-center gap-2 font-semibold">
+            <KeyRound size={18} className="text-blue-500" />
+            Account security
+          </h2>
+          <p className="mt-4 text-sm leading-7 text-[var(--hms-text-muted)]">
+            Receive a password reset link at your login email. Your
+            administrator manages your role, department and record assignments.
+          </p>
+          <button
+            type="button"
+            disabled={!!auth.busy}
+            className={`${secondaryButton} mt-5`}
+            onClick={() => {
+              setNotice("");
+              void auth.sendResetEmail(user.email).then((sent) => {
+                if (sent) setNotice("Password reset email sent.");
+              });
+            }}
+          >
+            Send password reset email
+          </button>
+        </Card>
+      </div>
+      <ErrorMessage message={error || state.error || auth.error} />
+      {notice && (
+        <p
+          role="status"
+          className="rounded-xl bg-emerald-500/10 p-3 text-sm text-emerald-500"
+        >
+          {notice}
+        </p>
+      )}
+      {access.isAdmin && <DataTools />}
+    </Page>
+  );
 }
